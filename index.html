@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TruthChain - Verifica ESG</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f9f4; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 400px; width: 100%; text-align: center; }
+        .logo { color: #2e7d32; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+        .tagline { color: #666; font-size: 14px; margin-bottom: 30px; }
+        input { width: 80%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        button { background-color: #2e7d32; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%; transition: background 0.3s; }
+        button:hover { background-color: #1b5e20; }
+        .result-card { margin-top: 30px; text-align: left; background: #e8f5e9; padding: 20px; border-radius: 10px; border-left: 5px solid #2e7d32; display: none; }
+        .badge { background: #2e7d32; color: white; padding: 3px 8px; border-radius: 12px; font-size: 12px; float: right; }
+        .data-row { margin-bottom: 10px; border-bottom: 1px solid #c8e6c9; padding-bottom: 5px; }
+        .label { font-size: 12px; color: #555; text-transform: uppercase; letter-spacing: 1px; }
+        .value { font-weight: bold; font-size: 16px; }
+        .hash { font-family: monospace; font-size: 10px; color: #888; word-break: break-all; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo">🌿 TruthChain</div>
+        <div class="tagline">Passaporto Digitale del Prodotto</div>
+
+        <h3>Verifica Origine</h3>
+        <p style="font-size: 14px; color: #666;">Inserisci il codice lotto presente sulla confezione:</p>
+        
+        <input type="text" id="batchId" placeholder="Es. 10452" value="10452">
+        <button onclick="verifyProduct()">Verifica Blockchain</button>
+
+        <div id="result" class="result-card">
+            <div style="margin-bottom: 15px;">
+                <span class="value" style="font-size: 18px;">Vino Barolo DOCG Bio</span>
+                <span class="badge">VERIFICATO</span>
+            </div>
+            
+            <div class="data-row">
+                <div class="label">Produttore</div>
+                <div class="value">Cantine Rossi & Figli</div>
+            </div>
+            <div class="data-row">
+                <div class="label">Origine</div>
+                <div class="value">Serralunga d'Alba (CN)</div>
+            </div>
+            <div class="data-row">
+                <div class="label">Carbon Footprint</div>
+                <div class="value">0.85 kg CO2eq / bottiglia</div>
+            </div>
+            <div class="data-row">
+                <div class="label">Certificato ESG</div>
+                <div class="value"><a href="#" style="color:#2e7d32">Visualizza PDF (IPFS)</a></div>
+            </div>
+
+            <div class="label" style="margin-top: 15px;">Blockchain Hash (Immutable Proof)</div>
+            <div class="hash">0x8f3c2a1d9e4b7a6f5c8d9e0b1a2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c</div>
+        </div>
+    </div>
+
+    <script>
+        function verifyProduct() {
+            const btn = document.querySelector('button');
+            const result = document.getElementById('result');
+            
+            // Simula caricamento
+            btn.innerHTML = "Verifica in corso...";
+            btn.style.backgroundColor = "#888";
+            
+            setTimeout(() => {
+                btn.innerHTML = "Verifica Blockchain";
+                btn.style.backgroundColor = "#2e7d32";
+                result.style.display = "block";
+                result.scrollIntoView({ behavior: 'smooth' });
+            }, 1500); // Ritardo scenico di 1.5 secondi
+        }
+    </script>
+</body>
+</html>
