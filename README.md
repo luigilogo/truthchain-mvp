@@ -27,4 +27,4 @@ Questo PoC (*Proof of Concept*) applica concretamente i concetti appresi:
 * `/backend`: Contiene il codice Python (FastAPI) per l'interazione off-chain.
 
 ---
-*Progetto sviluppato da [Tuo Nome] per il Master D-ESG - Università di Torino.*
+*Progetto sviluppato da Luigi Logozzo per il Master D-ESG - Università di Torino.*
