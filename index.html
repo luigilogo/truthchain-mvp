@@ -1,128 +1,375 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CareerSoul | Decentralized CV</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
-    <style>
+    <title>CareerSoul | Sovereign Identity Protocol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <style>
         :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --primary: #38bdf8; /* Sky Blue */
-            --accent: #6366f1; /* Indigo */
-            --text: #f1f5f9;
-            --muted: #94a3b8;
+            --bg-dark: #050505;
+            --glass: rgba(20, 20, 25, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --primary: #00f0ff; /* Cyber Cyan */
+            --secondary: #7000ff; /* Deep Purple */
+            --success: #00ff9d; /* ESG Green */
+            --text-main: #ffffff;
+            --text-muted: #8892b0;
         }
 
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; padding: 20px; }
-        .container { max-width: 500px; width: 100%; }
+        * { box-sizing: border-box; cursor: default; }
 
-        /* Profile Header */
-        .profile { text-align: center; margin-bottom: 30px; }
-        .avatar { width: 100px; height: 100px; background: linear-gradient(to right, var(--primary), var(--accent)); border-radius: 50%; margin: 0 auto 15px; border: 4px solid var(--bg); box-shadow: 0 0 20px rgba(56, 189, 248, 0.3); }
-        h1 { margin: 0; font-size: 24px; }
-        .did-badge { background: #334155; padding: 5px 12px; border-radius: 20px; font-family: 'Fira Code', monospace; font-size: 12px; color: var(--primary); display: inline-block; margin-top: 10px; }
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
 
-        /* Skill Cards (SBTs) */
-        .sbt-card {
-            background: var(--card);
-            border-radius: 16px;
+        /* --- LAYOUT GRID --- */
+        .main-interface {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 20px;
+            max-width: 1400px;
+            width: 100%;
             padding: 20px;
-            margin-bottom: 15px;
-            border: 1px solid #334155;
+            height: 100vh;
+        }
+
+        /* --- COMPONENTS --- */
+        .panel {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
             position: relative;
             overflow: hidden;
-            transition: transform 0.2s;
         }
-        .sbt-card:hover { transform: translateY(-3px); border-color: var(--primary); }
+
+        .panel::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            opacity: 0.5;
+        }
+
+        h2 { font-size: 14px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; margin-top: 0; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-bottom: 20px; }
+
+        /* --- LEFT COLUMN: IDENTITY --- */
+        .avatar-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+        }
+
+        .avatar-img {
+            width: 100%; height: 100%; border-radius: 50%;
+            background: url('https://i.pravatar.cc/300?img=11') no-repeat center/cover;
+            border: 2px solid var(--glass-border);
+            position: relative; z-index: 2;
+        }
+
+        .holo-ring {
+            position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px;
+            border: 1px dashed var(--primary);
+            border-radius: 50%;
+            animation: spin 10s linear infinite;
+        }
+
+        .holo-ring-2 {
+            position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px;
+            border-top: 2px solid var(--secondary);
+            border-radius: 50%;
+            animation: spin-reverse 5s linear infinite;
+        }
+
+        .user-name { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 5px; }
+        .user-did { font-family: 'JetBrains Mono'; font-size: 10px; color: var(--primary); text-align: center; background: rgba(0, 240, 255, 0.1); padding: 4px; border-radius: 4px; display: inline-block; margin: 0 auto; width: 100%; }
+
+        .stat-row { display: flex; justify-content: space-between; margin-top: 15px; font-size: 14px; }
+        .stat-val { font-family: 'JetBrains Mono'; color: var(--success); }
+
+        /* --- MIDDLE COLUMN: CREDENTIALS --- */
+        .sbt-list { overflow-y: auto; padding-right: 5px; }
         
-        /* Ribbon "Verified" */
-        .verified-ribbon {
-            position: absolute; top: 12px; right: 12px;
-            background: rgba(56, 189, 248, 0.15); color: var(--primary);
-            font-size: 10px; padding: 4px 8px; border-radius: 4px;
-            font-weight: 700; border: 1px solid rgba(56, 189, 248, 0.3);
+        .sbt-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
+            border-left: 3px solid var(--text-muted);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        .role { font-weight: 700; font-size: 18px; display: block; margin-bottom: 5px; }
-        .company { color: var(--muted); font-size: 14px; display: flex; align-items: center; gap: 6px; }
-        .company::before { content: '🏢'; font-size: 12px; }
-
-        .skills-tag { margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap; }
-        .tag { background: #0f172a; padding: 4px 10px; border-radius: 6px; font-size: 11px; color: var(--accent); border: 1px solid #334155; }
-
-        .issuer-hash {
-            font-family: 'Fira Code', monospace; font-size: 10px; color: #475569; margin-top: 15px; border-top: 1px solid #334155; padding-top: 10px;
+        .sbt-card:hover {
+            transform: translateX(5px);
+            border-left-color: var(--primary);
+            box-shadow: -5px 0 15px rgba(0, 240, 255, 0.1);
         }
 
-        /* Add Button */
-        .btn-add {
-            background: linear-gradient(to right, var(--primary), var(--accent));
-            color: white; border: none; width: 100%; padding: 16px;
-            border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-            margin-top: 20px;
+        .sbt-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .role { font-weight: 700; font-size: 18px; color: var(--text-main); }
+        .verified-badge { font-size: 10px; background: rgba(0, 255, 157, 0.1); color: var(--success); padding: 2px 6px; border: 1px solid var(--success); border-radius: 4px; font-family: 'JetBrains Mono'; }
+        
+        .company { font-size: 14px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+        .skills-container { margin-top: 10px; display: flex; gap: 5px; flex-wrap: wrap; }
+        .skill-pill { font-size: 10px; padding: 3px 8px; background: rgba(255,255,255,0.05); border-radius: 10px; border: 1px solid var(--glass-border); }
+        .skill-pill.esg { border-color: var(--success); color: var(--success); }
+
+        /* --- RIGHT COLUMN: ANALYTICS & WALLET --- */
+        .wallet-btn {
+            background: linear-gradient(45deg, var(--secondary), #4a00e0);
+            border: none;
+            width: 100%;
+            padding: 15px;
+            color: white;
+            font-family: 'JetBrains Mono';
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(112, 0, 255, 0.4);
+        }
+
+        .wallet-btn:hover { box-shadow: 0 0 30px rgba(112, 0, 255, 0.8); transform: scale(1.02); }
+
+        .terminal-log {
+            font-family: 'JetBrains Mono';
+            font-size: 10px;
+            color: var(--text-muted);
+            height: 150px;
+            overflow-y: hidden;
+            display: flex;
+            flex-direction: column-reverse;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 10px;
+            margin-top: auto;
+        }
+
+        .log-entry { margin-bottom: 4px; }
+        .log-entry span { color: var(--primary); }
+
+        /* --- ANIMATIONS --- */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* RESPONSIVE */
+        @media (max-width: 1000px) {
+            .main-interface { grid-template-columns: 1fr; height: auto; }
+            .panel { margin-bottom: 20px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div class="main-interface">
         
-        <div class="profile">
-            <div class="avatar"></div>
-            <h1>Luigi Rossi</h1>
-            <div class="did-badge">DID:eth:0x71...C9A2</div>
-            <p style="color: var(--muted); font-size: 14px; margin-top: 10px;">
-                Blockchain & ESG Specialist | Verified by Soulbound Protocol
-            </p>
-        </div>
-
-        <h3 style="color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">
-            Verifiable Credentials (3)
-        </h3>
-
-        <div class="sbt-card">
-            <div class="verified-ribbon">✓ VERIFIED ON-CHAIN</div>
-            <span class="role">ESG Impact Manager</span>
-            <span class="company">GreenFuture Consulting S.r.l.</span>
-            <div class="skills-tag">
-                <span class="tag">#Sustainability</span>
-                <span class="tag">#Reporting</span>
-                <span class="tag">#Leadership</span>
+        <div class="panel">
+            <h2>Sovereign Identity</h2>
+            
+            <div class="avatar-container">
+                <div class="holo-ring"></div>
+                <div class="holo-ring-2"></div>
+                <div class="avatar-img"></div>
             </div>
-            <div class="issuer-hash">Issuer Sig: 0x4a...e1f9 (Verified Entity)</div>
-        </div>
 
-        <div class="sbt-card">
-            <div class="verified-ribbon">✓ VERIFIED ON-CHAIN</div>
-            <span class="role">Blockchain Developer</span>
-            <span class="company">TechMaster Academy</span>
-            <div class="skills-tag">
-                <span class="tag">#Solidity</span>
-                <span class="tag">#SmartContracts</span>
-                <span class="tag">#Ethereum</span>
+            <div class="user-name">Luigi Rossi</div>
+            <div class="user-did">did:eth:0x71C...C9A2</div>
+
+            <div style="margin-top: 30px;">
+                <div class="stat-row">
+                    <span>Reputation Score</span>
+                    <span class="stat-val">98/100</span>
+                </div>
+                <div class="stat-row">
+                    <span>Soulbound Tokens</span>
+                    <span class="stat-val">12</span>
+                </div>
+                <div class="stat-row">
+                    <span>Wallet Age</span>
+                    <span class="stat-val">4Y 2M</span>
+                </div>
             </div>
-            <div class="issuer-hash">Issuer Sig: 0x9b...3c2a (Verified University)</div>
-        </div>
 
-        <div class="sbt-card" style="border-color: var(--accent);">
-            <div class="verified-ribbon">★ PEER VALIDATED</div>
-            <span class="role">Top Team Player 2024</span>
-            <span class="company">Community Award</span>
-            <div class="skills-tag">
-                <span class="tag">#Empathy</span>
-                <span class="tag">#ConflictResolution</span>
+            <div style="margin-top: auto;">
+                <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 5px;">VERIFICATION LEVEL</div>
+                <div style="height: 4px; background: #222; border-radius: 2px; overflow: hidden;">
+                    <div style="width: 85%; height: 100%; background: var(--success); box-shadow: 0 0 10px var(--success);"></div>
+                </div>
+                <div style="font-size: 10px; text-align: right; margin-top: 3px; color: var(--success);">TIER 3 VERIFIED</div>
             </div>
-            <div class="issuer-hash">Consensus: 15 Colleagues Voted</div>
         </div>
 
-        <button class="btn-add" onclick="alert('In produzione, questo aprirebbe il Wallet (Metamask) per firmare la richiesta di validazione.')">
-            + Richiedi Nuova Validazione
-        </button>
+        <div class="panel">
+            <div style="display:flex; justify-content:space-between;">
+                <h2>Wallet Assets (SBTs)</h2>
+                <div style="font-size:12px; font-family:'JetBrains Mono'; color:var(--success);">● LIVE NETWORK</div>
+            </div>
+            
+            <div class="sbt-list">
+                
+                <div class="sbt-card">
+                    <div class="sbt-header">
+                        <span class="role">ESG Impact Manager</span>
+                        <span class="verified-badge">✓ VERIFIED</span>
+                    </div>
+                    <div class="company">Issued by: <strong>GreenFuture Consulting</strong></div>
+                    <div class="skills-container">
+                        <span class="skill-pill esg">Sustainability Reporting</span>
+                        <span class="skill-pill">Stakeholder Mgmt</span>
+                        <span class="skill-pill">GRI Standards</span>
+                    </div>
+                    <div style="margin-top:10px; font-size:9px; color:var(--text-muted); font-family:'JetBrains Mono'">TX: 0x8a2f...91b2</div>
+                </div>
+
+                <div class="sbt-card">
+                    <div class="sbt-header">
+                        <span class="role">Blockchain Architect</span>
+                        <span class="verified-badge">✓ VERIFIED</span>
+                    </div>
+                    <div class="company">Issued by: <strong>Politecnico di Torino</strong></div>
+                    <div class="skills-container">
+                        <span class="skill-pill">Solidity</span>
+                        <span class="skill-pill">Smart Contracts</span>
+                        <span class="skill-pill">D-Apps</span>
+                    </div>
+                    <div style="margin-top:10px; font-size:9px; color:var(--text-muted); font-family:'JetBrains Mono'">TX: 0x3c4d...e1e9</div>
+                </div>
+
+                <div class="sbt-card" style="border-left-color: var(--secondary);">
+                    <div class="sbt-header">
+                        <span class="role">Social Volounteer</span>
+                        <span class="verified-badge" style="color:var(--secondary); border-color:var(--secondary);">★ PEER REVIEWED</span>
+                    </div>
+                    <div class="company">Issued by: <strong>Torino City Lab</strong></div>
+                    <div class="skills-container">
+                        <span class="skill-pill esg">Urban Regeneration</span>
+                        <span class="skill-pill esg">Inclusive Design</span>
+                    </div>
+                    <div style="margin-top:10px; font-size:9px; color:var(--text-muted); font-family:'JetBrains Mono'">TX: 0x1a9b...f2f2</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>ESG Impact Analysis</h2>
+            
+            <div style="height: 200px; width: 100%;">
+                <canvas id="esgChart"></canvas>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button class="wallet-btn" onclick="connectWallet()">
+                    Connect Wallet
+                </button>
+                <button class="wallet-btn" style="background: transparent; border: 1px solid var(--primary); color: var(--primary);" onclick="addLog('Requesting new credential verification...')">
+                    + Request Verify
+                </button>
+            </div>
+
+            <div class="terminal-log" id="console">
+                <div class="log-entry">> Initializing CareerSoul Protocol v2.1...</div>
+                <div class="log-entry">> Connection to Ethereum Mainnet: <span style="color:var(--success)">STABLE</span></div>
+                <div class="log-entry">> Loading Soulbound Tokens... <span style="color:var(--success)">DONE (3)</span></div>
+            </div>
+        </div>
 
     </div>
 
+    <script>
+        // --- 1. CONFIGURAZIONE GRAFICO ESG ---
+        const ctx = document.getElementById('esgChart').getContext('2d');
+        const esgChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Environmental', 'Social', 'Governance', 'Tech', 'Soft Skills'],
+                datasets: [{
+                    label: 'Impact Score',
+                    data: [65, 95, 80, 70, 90],
+                    backgroundColor: 'rgba(0, 240, 255, 0.2)',
+                    borderColor: '#00f0ff',
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#fff'
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        pointLabels: { color: '#8892b0', font: { size: 10 } },
+                        ticks: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // --- 2. LOGICA CONSOLE E SIMULAZIONI ---
+        function addLog(text) {
+            const consoleDiv = document.getElementById('console');
+            const newEntry = document.createElement('div');
+            newEntry.className = 'log-entry';
+            
+            // Aggiungi timestamp
+            const time = new Date().toLocaleTimeString('it-IT', { hour12: false });
+            newEntry.innerHTML = `<span style="opacity:0.5">[${time}]</span> ${text}`;
+            
+            consoleDiv.prepend(newEntry);
+        }
+
+        function connectWallet() {
+            const btn = document.querySelector('.wallet-btn');
+            btn.innerHTML = "Connecting...";
+            addLog("MetaMask injection detected.");
+            addLog("Requesting accounts...");
+
+            setTimeout(() => {
+                btn.innerHTML = "0x71C...C9A2 (Connected)";
+                btn.style.background = "var(--success)";
+                btn.style.boxShadow = "0 0 20px rgba(0, 255, 157, 0.4)";
+                addLog("Wallet connected successfully.");
+                addLog("Fetching SBT balance from contract 0xCareerSoul...");
+            }, 1500);
+        }
+
+        // Simulazione traffico blockchain automatico
+        setInterval(() => {
+            const events = [
+                "New block mined: #18239102",
+                "Syncing ESG data oracle...",
+                "Validating DID signature...",
+                "Peer node connected (EU-West-1)"
+            ];
+            const randomEvent = events[Math.floor(Math.random() * events.length)];
+            if(Math.random() > 0.7) { // 30% chance ogni 3 secondi
+                addLog(randomEvent);
+            }
+        }, 3000);
+
+    </script>
 </body>
 </html>
