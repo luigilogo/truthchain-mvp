@@ -3,78 +3,385 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TruthChain - Verifica ESG</title>
+    <title>TruthChain | D-ESG Verification Node</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f9f4; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 400px; width: 100%; text-align: center; }
-        .logo { color: #2e7d32; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-        .tagline { color: #666; font-size: 14px; margin-bottom: 30px; }
-        input { width: 80%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
-        button { background-color: #2e7d32; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%; transition: background 0.3s; }
-        button:hover { background-color: #1b5e20; }
-        .result-card { margin-top: 30px; text-align: left; background: #e8f5e9; padding: 20px; border-radius: 10px; border-left: 5px solid #2e7d32; display: none; }
-        .badge { background: #2e7d32; color: white; padding: 3px 8px; border-radius: 12px; font-size: 12px; float: right; }
-        .data-row { margin-bottom: 10px; border-bottom: 1px solid #c8e6c9; padding-bottom: 5px; }
-        .label { font-size: 12px; color: #555; text-transform: uppercase; letter-spacing: 1px; }
-        .value { font-weight: bold; font-size: 16px; }
-        .hash { font-family: monospace; font-size: 10px; color: #888; word-break: break-all; margin-top: 10px; }
+        :root {
+            --primary: #00ff88; /* Neon ESG Green */
+            --primary-dim: rgba(0, 255, 136, 0.1);
+            --bg: #050505;
+            --surface: #111111;
+            --border: #333;
+            --text: #e0e0e0;
+            --text-muted: #888;
+        }
+
+        * { box-sizing: border-box; outline: none; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 50% 0%, #1a1a1a 0%, transparent 70%),
+                linear-gradient(0deg, rgba(0,255,136,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        /* --- UI COMPONENTS --- */
+        .glass-panel {
+            background: rgba(17, 17, 17, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+            margin-top: 5vh;
+            z-index: 2;
+        }
+
+        /* --- HEADER --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+        }
+
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span { color: var(--primary); text-shadow: 0 0 10px var(--primary-dim); }
+        .status-dot { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); animation: pulse 2s infinite; }
+
+        /* --- SEARCH SECTION --- */
+        .search-box {
+            padding: 40px;
+            text-align: center;
+            transition: all 0.5s ease;
+        }
+
+        h1 { font-weight: 300; font-size: 2rem; margin-bottom: 10px; letter-spacing: -0.5px; }
+        p.subtitle { color: var(--text-muted); margin-bottom: 30px; }
+
+        .input-group {
+            position: relative;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        input {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-dim); }
+
+        button.cta {
+            margin-top: 20px;
+            background: var(--primary);
+            color: black;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button.cta:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 255, 136, 0.2); }
+
+        /* --- TERMINAL LOADER --- */
+        .terminal-loader {
+            display: none;
+            font-family: 'JetBrains Mono', monospace;
+            text-align: left;
+            padding: 20px;
+            color: var(--primary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .blink { animation: blink 1s infinite; }
+
+        /* --- DASHBOARD RESULT --- */
+        .dashboard {
+            display: none;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: 0.8s ease;
+        }
+
+        .card {
+            padding: 25px;
+            border-top: 3px solid transparent;
+        }
+
+        .card:hover { border-color: var(--primary); }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #111, #222);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-image::after {
+            content: "IMG_IPFS_FETCHED";
+            color: #444;
+            font-family: 'JetBrains Mono';
+            font-size: 12px;
+        }
+
+        .score-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 8px solid #222;
+            border-top-color: var(--primary);
+            border-right-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 auto;
+            box-shadow: 0 0 20px var(--primary-dim);
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .data-item .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .data-item .value { font-size: 16px; font-weight: 500; margin-top: 4px; }
+
+        .hash-box {
+            background: #000;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text-muted);
+            word-break: break-all;
+            border-left: 3px solid var(--primary);
+            margin-top: 20px;
+        }
+
+        .timeline {
+            margin-top: 25px;
+            padding-left: 10px;
+            border-left: 1px solid var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -5px;
+            top: 5px;
+            width: 9px;
+            height: 9px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .dashboard { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="logo">🌿 TruthChain</div>
-        <div class="tagline">Passaporto Digitale del Prodotto</div>
-
-        <h3>Verifica Origine</h3>
-        <p style="font-size: 14px; color: #666;">Inserisci il codice lotto presente sulla confezione:</p>
-        
-        <input type="text" id="batchId" placeholder="Es. 10452" value="10452">
-        <button onclick="verifyProduct()">Verifica Blockchain</button>
-
-        <div id="result" class="result-card">
-            <div style="margin-bottom: 15px;">
-                <span class="value" style="font-size: 18px;">Vino Barolo DOCG Bio</span>
-                <span class="badge">VERIFICATO</span>
-            </div>
-            
-            <div class="data-row">
-                <div class="label">Produttore</div>
-                <div class="value">Cantine Rossi & Figli</div>
-            </div>
-            <div class="data-row">
-                <div class="label">Origine</div>
-                <div class="value">Serralunga d'Alba (CN)</div>
-            </div>
-            <div class="data-row">
-                <div class="label">Carbon Footprint</div>
-                <div class="value">0.85 kg CO2eq / bottiglia</div>
-            </div>
-            <div class="data-row">
-                <div class="label">Certificato ESG</div>
-                <div class="value"><a href="#" style="color:#2e7d32">Visualizza PDF (IPFS)</a></div>
-            </div>
-
-            <div class="label" style="margin-top: 15px;">Blockchain Hash (Immutable Proof)</div>
-            <div class="hash">0x8f3c2a1d9e4b7a6f5c8d9e0b1a2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c</div>
+    <header>
+        <div class="logo">
+            <div class="status-dot"></div>
+            TRUTH<span>CHAIN</span>
         </div>
+        <div style="font-family: 'JetBrains Mono'; font-size: 12px; color: var(--text-muted);">
+            NODE: EU-WEST-3 <span style="color:var(--primary)">● ONLINE</span>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div id="searchView" class="glass-panel search-box">
+            <h1>Verifica Origine ESG</h1>
+            <p class="subtitle">Inserisci il Batch ID per interrogare lo Smart Contract e visualizzare il Passaporto Digitale.</p>
+            
+            <div class="input-group">
+                <input type="text" id="batchId" placeholder="Batch ID (es. 0x892...)" value="BATCH-IT-2024-8892">
+            </div>
+            <button class="cta" onclick="startVerification()">Esegui Scansione Blockchain</button>
+        </div>
+
+        <div id="terminal" class="glass-panel terminal-loader">
+            <div>> Initializing Web3 connection...</div>
+            <div id="line2" style="display:none">> Querying Smart Contract at 0x71C...</div>
+            <div id="line3" style="display:none">> Verifying IPFS Merkle Roots...</div>
+            <div id="line4" style="display:none">> Retrieving Carbon Footprint data...</div>
+            <div id="line5" style="display:none; color: #fff;">> SUCCESS. DATA VERIFIED. <span class="blink">_</span></div>
+        </div>
+
+        <div id="dashboard" class="dashboard">
+            
+            <div class="glass-panel card" style="text-align: center;">
+                <div class="product-image">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                    </svg>
+                </div>
+                
+                <h2 style="margin: 0; font-size: 1.5rem;">Barolo Riserva Bio</h2>
+                <p style="color: var(--text-muted); margin-top: 5px;">Lotto 2019 / DOCG</p>
+
+                <div style="margin-top: 30px;">
+                    <div class="score-circle">
+                        A+
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px;">RATING ESG</p>
+                </div>
+            </div>
+
+            <div class="glass-panel card">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px;">
+                    <span style="font-weight: 600;">PASSPORT DETAILS</span>
+                    <span style="font-family: 'JetBrains Mono'; font-size: 12px; color: var(--primary);">VERIFIED ✓</span>
+                </div>
+
+                <div class="data-grid">
+                    <div class="data-item">
+                        <div class="label">Produttore</div>
+                        <div class="value">Cantine Rossi & Figli</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Location</div>
+                        <div class="value">Serralunga d'Alba, IT</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Carbon Footprint</div>
+                        <div class="value" style="color: var(--primary);">0.85 kg CO2eq</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Water Usage</div>
+                        <div class="value">-12% vs Avg</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <div class="label" style="margin-bottom: 10px;">SUPPLY CHAIN EVENTS</div>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div style="font-size: 14px;">Raccolta & Analisi Bio</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">15 Settembre 2019 - 08:30 AM</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div style="font-size: 14px;">Imbottigliamento & RFID Tagging</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">12 Marzo 2022 - 14:15 PM</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div style="font-size: 14px;">Distribuzione Logistica Green</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">02 Novembre 2024 - 09:00 AM</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hash-box">
+                    <div style="margin-bottom: 5px; color: #fff;">IMMUTABLE PROOF (TX HASH)</div>
+                    0x8f3c2a1d9e4b7a6f5c8d9e0b1a2c3d4e5f6a7b8c...
+                </div>
+            </div>
+
+        </div>
+
     </div>
 
     <script>
-        function verifyProduct() {
-            const btn = document.querySelector('button');
-            const result = document.getElementById('result');
-            
-            // Simula caricamento
-            btn.innerHTML = "Verifica in corso...";
-            btn.style.backgroundColor = "#888";
-            
+        function startVerification() {
+            // UI Logic
+            const searchView = document.getElementById('searchView');
+            const terminal = document.getElementById('terminal');
+            const dashboard = document.getElementById('dashboard');
+
+            // 1. Hide Search
+            searchView.style.opacity = '0';
             setTimeout(() => {
-                btn.innerHTML = "Verifica Blockchain";
-                btn.style.backgroundColor = "#2e7d32";
-                result.style.display = "block";
-                result.scrollIntoView({ behavior: 'smooth' });
-            }, 1500); // Ritardo scenico di 1.5 secondi
+                searchView.style.display = 'none';
+                terminal.style.display = 'block';
+                
+                // 2. Run Terminal Sequence
+                setTimeout(() => document.getElementById('line2').style.display = 'block', 600);
+                setTimeout(() => document.getElementById('line3').style.display = 'block', 1400);
+                setTimeout(() => document.getElementById('line4').style.display = 'block', 2400);
+                setTimeout(() => {
+                    document.getElementById('line5').style.display = 'block';
+                    
+                    // 3. Show Dashboard
+                    setTimeout(() => {
+                        terminal.style.display = 'none';
+                        dashboard.style.display = 'grid';
+                        // Small delay to allow display:grid to apply before opacity transition
+                        setTimeout(() => {
+                            dashboard.style.opacity = '1';
+                            dashboard.style.transform = 'translateY(0)';
+                        }, 50);
+                    }, 1000);
+
+                }, 3500);
+
+            }, 500);
         }
     </script>
 </body>
